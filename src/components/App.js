@@ -30,9 +30,9 @@ export default class App extends React.Component {
     console.log(event.target.value);
   };
 
-  getOptionsItems = item => {
-    item.map(country => (
-      <option value={item.id} key={item.id}>
+  getOptionsItems = items => {
+    return items.map(item => (
+      <option key={item.id} value={item.id}>
         {item.name}
       </option>
     ));
