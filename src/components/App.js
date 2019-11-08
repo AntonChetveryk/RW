@@ -11,7 +11,7 @@ export default class App extends React.Component {
       repeatPassword: "",
       country: "",
       gender: "female",
-      agree: true
+      agree: false
     };
   }
 
@@ -39,7 +39,17 @@ export default class App extends React.Component {
       // [event.target.name]: !event.target.value not working
       // [event.target.name]: event.target.value == "true" ? false : true
     });
-    console.log(event.target.name, event.target.value, event.target.checked);
+    console.log(
+      "onChangeAgree:       ",
+      "state: ",
+      this.state.agree,
+      "eventTargetName: ",
+      event.target.name,
+      "targetValue: ",
+      event.target.value,
+      "event.target.checked: ",
+      event.target.checked
+    );
   };
 
   getOptionsItems = items => {
@@ -51,7 +61,10 @@ export default class App extends React.Component {
   };
 
   render() {
-    //console.log(this);
+    {
+      console.log("render");
+      console.log("this.state: ", this.state.agree);
+    }
     return (
       <div className="form-container card">
         <form className="form card-body">
