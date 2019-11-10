@@ -61,10 +61,9 @@ export default class App extends React.Component {
   };
 
   render() {
-    {
-      console.log("render");
-      console.log("this.state: ", this.state.agree);
-    }
+    console.log("render");
+    console.log("this.state: ", this.state.agree);
+
     return (
       <div className="form-container card">
         <form className="form card-body">
