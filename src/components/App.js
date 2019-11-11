@@ -1,6 +1,10 @@
 import React from "react";
 import countries from "../data/countries";
 
+// "Must be 5 characters or more"
+// "Required"
+// "Must be equal password"
+
 export default class App extends React.Component {
   constructor() {
     super();
@@ -9,47 +13,74 @@ export default class App extends React.Component {
       username: "",
       password: "",
       repeatPassword: "",
-      country: "",
-      gender: "female",
-      agree: false
+      country: "1",
+      gender: "male",
+      agree: true,
+      avatar: "",
+      age: 16,
+      errors: {
+        username: false,
+        password: false,
+        repeatPassword: false,
+        age: false
+      }
     };
   }
-
-  componentDidMount() {
-    this.username.focus();
-  }
-
-  onSubmit = event => {
-    event.preventDefault();
-    console.log("refs: ", this.username.value, this.password.value);
-    console.log("state: ", this.state.username, this.state.password);
-  };
 
   onChange = event => {
     this.setState({
       [event.target.name]: event.target.value
     });
-    console.log(event.target.value);
   };
 
   onChangeAgree = event => {
-    //console.log(typeof event.target.value);
+    console.log(event.target.name, event.target.value, event.target.checked);
+    console.log(typeof event.target.value);
     this.setState({
       [event.target.name]: event.target.checked
       // [event.target.name]: !event.target.value not working
       // [event.target.name]: event.target.value == "true" ? false : true
     });
-    console.log(
-      "onChangeAgree:       ",
-      "state: ",
-      this.state.agree,
-      "eventTargetName: ",
-      event.target.name,
-      "targetValue: ",
-      event.target.value,
-      "event.target.checked: ",
-      event.target.checked
-    );
+  };
+
+  onChangeAvatar = event => {
+    const reader = new FileReader();
+    reader.onload = event => {
+      this.setState({
+        avatar: event.target.result
+      });
+    };
+
+    reader.readAsDataURL(event.target.files[0]);
+  };
+
+  onSubmit = event => {
+    event.preventDefault();
+    // console.log("refs", this.username.value, this.password.value);
+    const errors = {};
+    if (this.state.username.length < 5) {
+      errors.username = "Must be 5 characters or more";
+    }
+
+    if (this.state.password < 3) {
+      errors.password = "Must be 3 characters or more";
+    }
+
+    if (this.state.password !== this.state.repeatPassword) {
+      errors.repeatPassword = "Must be equal password";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      // error
+      this.setState({
+        errors: errors
+      });
+    } else {
+      this.setState({
+        errors: {}
+      });
+      console.log("submit", this.state);
+    }
   };
 
   getOptionsItems = items => {
@@ -60,53 +91,110 @@ export default class App extends React.Component {
     ));
   };
 
-  render() {
-    console.log("render");
-    console.log("this.state: ", this.state.agree);
+  incrementAge = () => {
+    this.setState(
+      (prevState, prevProps) => ({
+        age: prevState.age + 1
+      }),
+      () => {
+        console.log("callback", this.state.age);
+        this.setState({
+          errors: {
+            age: this.state.age > 18 ? false : "Must be more 18"
+          }
+        });
+      }
+    );
 
+    // this.setState((prevState, prevProps) => ({
+    //   age: prevState.age + 1
+    // }));
+    // console.log("incrementAge", this.state.age);
+    // this.setState((prevState, prevProps) => ({
+    //   age: prevState.age + 1
+    // }));
+  };
+
+  decrementAge = () => {
+    this.setState(
+      {
+        age: this.state.age - 1
+      },
+      () => {
+        console.log("callback", this.state.age);
+        this.setState({
+          errors: {
+            age: this.state.age > 18 ? false : "Must be more 18"
+          }
+        });
+      }
+    );
+  };
+
+  render() {
+    // console.log(this);
+
+    // const getOptionsCountries = countries.map(country => (
+    //   <option key={country.id} value={country.id}>
+    //     {country.name}
+    //   </option>
+    // ));
+    // console.log("getOptionsCountries", getOptionsCountries);
+    console.log("render", this.state.age);
     return (
       <div className="form-container card">
         <form className="form card-body">
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label>Username</label>
             <input
               type="text"
               className="form-control"
               placeholder="Enter username"
               ref={node => (this.username = node)}
+              name="username"
               value={this.state.username}
               onChange={this.onChange}
-              name="username"
-              id="username"
             />
+            {this.state.errors.username ? (
+              <div className="invalid-feedback">
+                {this.state.errors.username}
+              </div>
+            ) : null}
           </div>
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label>Password</label>
             <input
               type="text"
               className="form-control"
               placeholder="Enter password"
               ref={node => (this.password = node)}
+              name="password"
               value={this.state.password}
               onChange={this.onChange}
-              name="password"
-              id="password"
             />
+            {this.state.errors.password ? (
+              <div className="invalid-feedback">
+                {this.state.errors.password}
+              </div>
+            ) : null}
           </div>
           <div className="form-group">
-            <label htmlFor="repeatPassword">Repeat password</label>
+            <label>Repeat password</label>
             <input
               type="text"
               className="form-control"
               placeholder="Enter repeat password"
               ref={node => (this.repeatPassword = node)}
+              name="repeatPassword"
               value={this.state.repeatPassword}
               onChange={this.onChange}
-              name="repeatPassword"
-              id="repeatPassword"
             />
+            {this.state.errors.repeatPassword ? (
+              <div className="invalid-feedback">
+                {this.state.errors.repeatPassword}
+              </div>
+            ) : null}
           </div>
-
           <div className="form-group">
             <label htmlFor="country">Country</label>
             <select
@@ -119,7 +207,6 @@ export default class App extends React.Component {
               {this.getOptionsItems(countries)}
             </select>
           </div>
-
           <fieldset className="form-group">
             <div>Gender</div>
             <div className="form-check">
@@ -151,7 +238,48 @@ export default class App extends React.Component {
               </label>
             </div>
           </fieldset>
-
+          <div className="form-group">
+            <label htmlFor="avatar">Avatar</label>
+            <input
+              type="file"
+              className="form-control-file"
+              id="avatar"
+              name="avatar"
+              onChange={this.onChangeAvatar}
+            />
+          </div>
+          <div className="form-group">
+            <div>
+              <label>Age</label>
+            </div>
+            <div className="btn-group">
+              <button
+                className="btn btn-secondary"
+                type="button"
+                onClick={this.decrementAge}
+              >
+                -
+              </button>
+              <input
+                type="number"
+                className="form-control"
+                placeholder="Enter age"
+                name="age"
+                value={this.state.age}
+                onChange={this.onChange}
+              />
+              <button
+                className="btn btn-secondary"
+                type="button"
+                onClick={this.incrementAge}
+              >
+                +
+              </button>
+            </div>
+            {this.state.errors.age ? (
+              <div className="invalid-feedback">{this.state.errors.age}</div>
+            ) : null}
+          </div>
           <div className="form-check mb-2">
             <input
               className="form-check-input"
@@ -166,7 +294,6 @@ export default class App extends React.Component {
               Confirm the processing of data
             </label>
           </div>
-
           <button
             type="submit"
             className="btn btn-primary w-100"
